@@ -5,6 +5,7 @@ import (
 
 	"github.com/kunal70006/realtime-chat-go/db"
 	"github.com/kunal70006/realtime-chat-go/internal/user"
+	"github.com/kunal70006/realtime-chat-go/internal/ws"
 	"github.com/kunal70006/realtime-chat-go/router"
 )
 
@@ -20,6 +21,12 @@ func main() {
 	userSvc := user.NewService(userRep)
 	userHandler := user.NewHandler(userSvc)
 
-	router.InitRouter(userHandler)
+	hub := ws.NewHub()
+
+	wsHandler := ws.NewHandler(hub)
+
+	go hub.Run()
+
+	router.InitRouter(userHandler, wsHandler)
 	router.Start("0.0.0.0:8080")
 }
